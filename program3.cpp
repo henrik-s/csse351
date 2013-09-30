@@ -19,7 +19,32 @@ struct coord{
 };
 
 
+/**
+Opening Comment block:
 
+Problem: Implement a checkers game that displays a checker board and uses transform 
+matrices to move round checkers. We must use picking for interaction and include new
+game support and more interactions. We must try to recreate checker rules.
+
+Solution: We drew each square of the checkerboard individually in square.h and gave each square
+its own picking ID. Using these IDs we were able to figure out the coordinate of each
+click. We then created checkers which are uploaded to the GPU and translated in the 
+shaders before they are drawn. We created a GameEngine that keeps track of the GameState
+and sends the board to the RenderEngine. The render engine uses the board to draw the 
+checkers according to their appropriate coordinates and colors them according to an 
+if-tree in simple.vert. As the gamestate changes in the GameEngine because of user clicks,
+the renderengine will update the display. As such, you can play checkers.
+
+For extra credit, we also implemented kings when a piece reaches the far side of the board.
+If you press space, there is a "CheatMode" that is activated. In cheatMode, you can select a
+piece and transport it to any square on the board. YOU CANNOT JUMP OVER PIECES TO KILL THEM IN
+CHEAT MODE. In cheatMode, if you press "k" while a piece is selected, it will be kinged. 
+
+You can restart the game by pressing "n".
+
+Authors: Henrik Sohlberg and Scott Harris
+Date: Sept. 30 2013
+*/
 class Program3
 {
 public:
