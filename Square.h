@@ -4,58 +4,48 @@
 #include "glew/glew.h"
 #include <vector>
 using namespace std; //makes using vectors easy
-
+/**
+Makes the board in the position arrays
+*/
 class Square
 {
 public:
 
 	Square()
 	{
-		//triangle 1
 		int rowsize = 4;
 		int colsize = 8;
+		//origin should be in bottom left
 		int ox = -1;
 		int oy = -1;
 		float sqwidth = .25;
 		int id = 1;
+
+		//creates positions for each square
 		for(int x = 0; x < rowsize; x++){
 			for(int y = 0; y < colsize; y++){
 				float offset = .25;
 				if(y%2 != 0){
 					offset = 0;
 				}
-
+				
+				//bottom left vertex
 				positions.push_back(ox+offset+x*2*sqwidth);
 				positions.push_back(oy+y*sqwidth);
 
+				//bottom right vertex
 				positions.push_back(ox+offset+x*2*sqwidth+sqwidth);
 				positions.push_back(oy+y*sqwidth);
-
+				
+				//top right
 				positions.push_back(ox+offset+x*2*sqwidth+sqwidth);
 				positions.push_back(oy+y*sqwidth+sqwidth);
 
+				//top left
 				positions.push_back(ox+offset+x*2*sqwidth);
 				positions.push_back(oy+y*sqwidth+sqwidth);
 
-				//triangle 2
-
-
-				colors.push_back(1.0f);
-				colors.push_back(1.0f);
-				colors.push_back(0.3f);
-
-				colors.push_back(1.0f);
-				colors.push_back(0.0f);
-				colors.push_back(0.8f);
-
-				colors.push_back(0.0f);
-				colors.push_back(1.0f);
-				colors.push_back(0.8f);
-
-				colors.push_back(0.2f);
-				colors.push_back(0.1f);
-				colors.push_back(1.0f);
-
+				//pushes an identity for each vertex
 				identity.push_back(id);
 				identity.push_back(id);
 				identity.push_back(id);
@@ -65,32 +55,20 @@ public:
 			}
 		}
 	}
-
-	vector<GLfloat> betterWay() {
-		return positions;
-	}
-
+	//points to position array
 	GLfloat const * getPosition() const
 	{ return &positions[0]; }
-
-	GLfloat const * getColor() const
-	{ return &colors[0]; }
-
+	//gets number of vertexes
 	size_t getVertexCount() const
 	{ return positions.size()/2; }
-
+	//number of bytes in position array
 	size_t getPositionBytes() const
 	{ return positions.size()*sizeof(GLfloat); }
-
-	size_t getColorBytes() const
-	{ return colors.size()*sizeof(GLfloat); }
-
+	//number of bytes in identity array
 	size_t getIdentityBytes() const
 	{ return identity.size()*sizeof(int);}
 	vector<GLfloat> positions;
-	vector<GLfloat> colors;
 	vector<int> identity;
-	size_t objectCount;
 private:
 	
 };

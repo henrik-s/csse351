@@ -4,10 +4,7 @@
 #include "GLHelper.h"
 #include "Square.h"
 #include "Checker.h"
-//.#include "CellData.h"
-struct cell{
-	int id;
-};
+
 
 
 class RenderEngine
@@ -24,7 +21,6 @@ public:
 		{
 			// Clean up the buffers
 			glDeleteBuffers(1, &positionBuffer);
-			glDeleteBuffers(1, &colorBuffer);
 			glDeleteBuffers(1, &identityBuffer);
 		}
 	}
@@ -60,24 +56,23 @@ public:
 		//upload uniform
 		currentTime = clk.GetElapsedTime();
 		glUniform1f(timeSlot, currentTime);
-		//setup position attribute
 
+		//upload picking uniform
 		if(pickingEnabled)
 			glUniform1i(pickingSlot, GL_TRUE);
 		else
 			glUniform1i(pickingSlot, GL_FALSE);
+
+		//upload cheat uniform to change color in cheat
 		if(cheatMode)
 			glUniform1i(colorIDSlot, -2);
 		else
 			glUniform1i(colorIDSlot, 0);
+
+		//setup position attribute
 		glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
 		glEnableVertexAttribArray(positionSlot);
 		glVertexAttribPointer(positionSlot, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-		//color attribute
-		glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-		glEnableVertexAttribArray(colorSlot);
-		glVertexAttribPointer(colorSlot, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		//identity attribute
 		glBindBuffer(GL_ARRAY_BUFFER, identityBuffer);
@@ -88,40 +83,38 @@ public:
 		for(int i = 0; i < model.getVertexCount(); i=i+4){
 			glDrawArrays(GL_TRIANGLE_FAN, i, 4);
 		}
+		/*dont draw the checkers if picking's enabled
+		they'd deliver the wrong color value since we
+		only care for the squares**/
 		if(!pickingEnabled){
-
-			for(int s=0; s<7; s++){
-				for(int t = 0; t<7;t++){
-				//h = CellData(s,t);
-				h.id = s+2;
-				cel[s][t]=h;
-				}
-			}
-			cel[0][0].id=3;
+			
+			//draws the checkers on the board
 			for(int w=0; w<8; w++){
 				for(int v=0;v<8;v++){
 					int q = board[w][v];
+					//color the checker according to id
 					if(q==0&&cheatMode)
 						glUniform1i(colorIDSlot, -2);
 					else						
 						glUniform1i(colorIDSlot, q);
+					//upload the positions for the transform
 					glUniform1f(transSlotX, (w*.25)-.875);
 					glUniform1f(transSlotY, (v*.25)-.875);
+					//draw the checker
 					glDrawArrays(GL_TRIANGLE_FAN, model.getVertexCount(), 362);
 				}
 
 			}
 		}
+		//uniform cleanup
 		glUniform1f(colorIDSlot, 0);
 		glUniform1f(transSlotX, 0);
 		glUniform1f(transSlotY, 0);
+
 		//cleanup
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-
-
 		glDisableVertexAttribArray(positionSlot);
-		glDisableVertexAttribArray(colorSlot);
 		glDisableVertexAttribArray(identitySlot);
 
 		glUseProgram(0);
@@ -136,7 +129,6 @@ private:
 	GLuint redProg;
 
 	GLuint positionBuffer;
-	GLuint colorBuffer;
 	GLuint identityBuffer;
 
 	GLint positionSlot;
@@ -147,8 +139,6 @@ private:
 	GLint transSlotY;
 	GLint colorIDSlot;
 	GLint pickingSlot;
-	cell cel[8][8];
-	cell h;
 
 	sf::Clock clk;
 
@@ -191,21 +181,10 @@ private:
 		all_positions.insert( all_positions.end(), model.positions.begin(), model.positions.end());
 		all_positions.insert( all_positions.end(), m2.positions.begin(), m2.positions.end());
 
-		vector<GLfloat> all_colors;
-		all_colors.reserve(sizeof(model.colors) + sizeof(m2.colors));
-		all_colors.insert( all_colors.end(), model.colors.begin(), model.colors.end());
-		all_colors.insert( all_colors.end(), m2.colors.begin(), m2.colors.end());
-
 		//setup board position buffer
 		glGenBuffers(1, &positionBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
 		glBufferData(GL_ARRAY_BUFFER, model.getPositionBytes()+m2.getPositionBytes(), &all_positions[0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		// Do the same thing for the color data
-		glGenBuffers(1, &colorBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-		glBufferData(GL_ARRAY_BUFFER, model.getColorBytes()+m2.getColorBytes(), &all_colors[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		//setup identity buffer
