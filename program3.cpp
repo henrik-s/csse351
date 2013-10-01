@@ -55,6 +55,7 @@ public:
 		App = new sf::Window(sf::VideoMode(RESOLUTION, RESOLUTION, 32), "program3");
 		render.init();
 
+		// Initilize new game
 		gameEngine.init();
 		
 		// Start render loop
