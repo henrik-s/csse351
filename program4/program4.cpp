@@ -1,4 +1,3 @@
-//Replace with your usernames!
 #define printusers() printf("Program by HARRISSA+SOHLBEHD\n");
 
 #define GLEW_STATIC
@@ -17,7 +16,33 @@
 #define TARGET_FPS 30                // controls spin update rate
 #define TIME_WINDOW 3                // number of frames motion is valid after release
 
+/**
+Problem:
+The problem for this week is to use a trackball interface 
+to translate and rotate a cube in the intuitive way. We also
+need to keep the cube spinning after rotate and resize the
+window with the correct aspect ratio.
 
+Solution:
+First we created a rotation matrix using glm::rotate and 
+multiplied it by the current rotation transform. This keep
+track of how much it has been rotated. Using spin cube, we
+keep track of if the left click is down and keep the cube spinning
+
+For the translate, we change the values of the third column
+of the matrix to move it on the x, y and z axis.
+
+For the aspect ratio, we update the projection transform
+to match the size of the window and we update the trackball
+size to match the size of the window.
+
+Authors:
+Scott Harris
+Hendrik Sohlberg
+
+Date:
+October 4th 2013
+*/
 class Program4
 {
 public:
@@ -73,7 +98,14 @@ private:
 	glm::mat4 translateFromInput;
 	glm::mat4 rotationFromInput;
 	glm::mat4 rotationSpinStep;
-	
+	/**
+	Update Rotate uses the trackball info and computes the
+	phi and axis of rotation. It then uses glm::rotate to
+	calculate the rotation matrix. It then incrementally
+	changes the complete rotation matrix.
+
+	RotationFromInput keeps track of the total rotations
+	*/
 	void updateRotate(glm::ivec2 & oldPos, glm::ivec2 & newPos)
 	{
 
@@ -82,8 +114,11 @@ private:
 		
 		//computes the appropriate rotation data and stores in phi and axis
 		trackball.getRotation(phi, axis, oldPos, newPos);
+		//calculates rotation matrix
 		rotationSpinStep = glm::rotate(glm::mat4(), phi, axis);
+		//applies it to the current rotation
 		rotationFromInput = rotationSpinStep*rotationFromInput;
+		//applies it to the cube
 		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 
 	}
@@ -128,15 +163,16 @@ private:
 		render.setProjectionTransform(P);
 		trackball.setSize(newWidth, newHeight);
 	}
-	
+	/**
+	Spincube checks to see if the cube is spinning
+	(if left click was let go after moving).
+	If so, it keeps the rotation.
+	*/
 	void spinCube()
 	{
-		//
-		//
-		// Put your code for an incremental rotation here.  
-		//
-		//
+		//is it spinning?
 		if(spinning){
+			//keep rotating!
 			rotationFromInput = rotationSpinStep*rotationFromInput;
 			render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 		}
