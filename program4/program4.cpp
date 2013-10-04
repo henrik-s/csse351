@@ -76,45 +76,27 @@ private:
 	
 	void updateRotate(glm::ivec2 & oldPos, glm::ivec2 & newPos)
 	{
+
 		float phi;
 		glm::vec3 axis;
 		
 		//computes the appropriate rotation data and stores in phi and axis
 		trackball.getRotation(phi, axis, oldPos, newPos);
-		printf("%.2f\n", phi);
-		printf("%.2f, %.2f, %.2f\n", axis.x, axis.y, axis.z);
-		float p = sqrt(pow(axis.x,2)+pow(axis.y,2)+pow(axis.z,2));
-		glm::vec3 w = glm::vec3(axis.x/p, axis.y/p, axis.z/p);
-		glm::vec3 t= glm::vec3(1, w.y, w.z);
-		if(w.x > w.y && w.z > w.y)
-			t = glm::vec3(w.x, 1, w.z);
-		if(w.x > w.z && w.y > w.z)
-			t = glm::vec3(w.x, w.y, 1);
-		
-		glm::vec3 cross = glm::cross(t, w);
-		float c = sqrt(pow(cross.x,2)+pow(cross.y,2)+pow(cross.z,2));
-		glm::vec3 u = glm::vec3(cross.x/c, cross.y/c, cross.z/c);
-		glm::vec3 v = glm::cross(w, u);
-
-		glm::mat4 r1 = glm::mat4(glm::vec4(w, 0),glm::vec4(u, 0),glm::vec4(v,0),glm::vec4(0,0, 0, 1));
-		glm::mat4 r2 = glm::mat4(cos(phi), -sin(phi), 0, 0,  sin(phi), cos(phi),0,0,0,0, 0, 0, 0, 0,  0, 1);
-		glm::mat4 r3 = glm::transpose(r1);
-		glm::mat4 r4 =  r1*r2;
-		render.setModelTransform(r4);
-		render.setModelTransform(r3);
-		
-
-		//
-		//
-		// Put your code for a rotation of phi about axis here.
-		//
-		//
+		rotationSpinStep=glm::rotate(glm::mat4(), phi,axis);
+		rotationFromInput = rotationSpinStep*rotationFromInput;
+		render.setModelTransform(rotationFromInput*translateFromInput*translateToOrigin);
 
 	}
 	
 	void updateXYTranslate(glm::ivec2 & oldPos, glm::ivec2 & newPos)
 	{
-		#define XY_SENSITIVITY 0.01f  //may be helpful to reduce transform amount
+
+		#define XY_SENSITIVITY 0.006f  //may be helpful to reduce transform amount
+		float changeX = newPos.x-oldPos.x;
+		float changeY = newPos.y-oldPos.y;
+		translateFromInput[3][0] += changeX*XY_SENSITIVITY;
+		translateFromInput[3][1] += changeY*XY_SENSITIVITY;
+		render.setModelTransform(rotationFromInput*translateFromInput*translateToOrigin);
 		//
 		//
 		// Put your code for a translation in the x,y direction here.
@@ -124,7 +106,10 @@ private:
 	
 	void updateZTranslate(glm::ivec2 & oldPos, glm::ivec2 & newPos)
 	{
-		#define Z_SENSITIVITY 0.01f //may be helpful to reduce transform amount
+		#define Z_SENSITIVITY 0.006f //may be helpful to reduce transform amount
+		float changeZ = newPos.y-oldPos.y;
+		translateFromInput[3][2] += changeZ*Z_SENSITIVITY;
+		render.setModelTransform(rotationFromInput*translateFromInput*translateToOrigin);
 		//
 		//
 		// Put your code for a translation in the z direction here.
@@ -139,6 +124,9 @@ private:
 		// Put your code to adjust for the change in viewport here.
 		//
 		//
+		glm::mat4 P = glm::perspective(60.0f, (float)newWidth/(float)newHeight, 0.1f, 100.0f);
+		render.setProjectionTransform(P);
+		trackball.setSize(newWidth, newHeight);
 	}
 	
 	void spinCube()
@@ -148,6 +136,10 @@ private:
 		// Put your code for an incremental rotation here.  
 		//
 		//
+		if(spinning)
+			rotationFromInput = rotationSpinStep*rotationFromInput;
+
+		render.setModelTransform(rotationFromInput*translateToOrigin);
 	}
 
 	void handleEvents()
@@ -201,7 +193,10 @@ private:
 			if (Event.Type == sf::Event::MouseButtonReleased)
 			{
 				if(Event.MouseButton.Button == sf::Mouse::Left && !shiftDown)
+				{
 					buttonDown[0] = false;
+					spinning=true;
+				}
 				if(Event.MouseButton.Button == sf::Mouse::Right)
 					buttonDown[1] = false;
 				if(Event.MouseButton.Button == sf::Mouse::Middle)
@@ -211,7 +206,7 @@ private:
 				
 				timeSinceMotion = motionClock.GetElapsedTime();
 				float maxTime = 1.0f/(float)TARGET_FPS * TIME_WINDOW;
-				if(timeSinceMotion < maxTime)
+				if(timeSinceMotion > maxTime)
 					spinning = false;
 			}
 			
