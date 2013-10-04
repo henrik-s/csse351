@@ -1,5 +1,5 @@
 //Replace with your usernames!
-#define printusers() printf("Program by HARRISSA+USER2\n");
+#define printusers() printf("Program by HARRISSA+SOHLBEHD\n");
 
 #define GLEW_STATIC
 #include <stdio.h>
