@@ -82,7 +82,7 @@ private:
 		
 		//computes the appropriate rotation data and stores in phi and axis
 		trackball.getRotation(phi, axis, oldPos, newPos);
-		rotationSpinStep=glm::rotate(glm::mat4(), phi,axis);
+		rotationSpinStep = glm::rotate(glm::mat4(), phi, axis);
 		rotationFromInput = rotationSpinStep*rotationFromInput;
 		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 
@@ -92,29 +92,24 @@ private:
 	{
 
 		#define XY_SENSITIVITY 0.006f  //may be helpful to reduce transform amount
-		float changeX = newPos.x-oldPos.x;
-		float changeY = oldPos.y-newPos.y;
-		translateFromInput[3][0] += changeX*XY_SENSITIVITY;
-		translateFromInput[3][1] += changeY*XY_SENSITIVITY;
-		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 		//
 		//
 		// Put your code for a translation in the x,y direction here.
 		//
 		//
+
+		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 	}
 	
 	void updateZTranslate(glm::ivec2 & oldPos, glm::ivec2 & newPos)
 	{
 		#define Z_SENSITIVITY 0.006f //may be helpful to reduce transform amount
-		float changeZ = newPos.y-oldPos.y;
-		translateFromInput[3][2] += changeZ*Z_SENSITIVITY;
-		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 		//
 		//
 		// Put your code for a translation in the z direction here.
 		//
 		//
+		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 	}
 	
 	void updateAspectRatio(int const & newWidth, int const & newHeight)
