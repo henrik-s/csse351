@@ -1,5 +1,5 @@
 //Replace with your usernames!
-#define printusers() printf("Program by USER1+USER2\n");
+#define printusers() printf("Program by HARRISSA+USER2\n");
 
 #define GLEW_STATIC
 #include <stdio.h>
@@ -84,7 +84,7 @@ private:
 		trackball.getRotation(phi, axis, oldPos, newPos);
 		rotationSpinStep=glm::rotate(glm::mat4(), phi,axis);
 		rotationFromInput = rotationSpinStep*rotationFromInput;
-		render.setModelTransform(rotationFromInput*translateFromInput*translateToOrigin);
+		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 
 	}
 	
@@ -93,10 +93,10 @@ private:
 
 		#define XY_SENSITIVITY 0.006f  //may be helpful to reduce transform amount
 		float changeX = newPos.x-oldPos.x;
-		float changeY = newPos.y-oldPos.y;
+		float changeY = oldPos.y-newPos.y;
 		translateFromInput[3][0] += changeX*XY_SENSITIVITY;
 		translateFromInput[3][1] += changeY*XY_SENSITIVITY;
-		render.setModelTransform(rotationFromInput*translateFromInput*translateToOrigin);
+		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 		//
 		//
 		// Put your code for a translation in the x,y direction here.
@@ -109,7 +109,7 @@ private:
 		#define Z_SENSITIVITY 0.006f //may be helpful to reduce transform amount
 		float changeZ = newPos.y-oldPos.y;
 		translateFromInput[3][2] += changeZ*Z_SENSITIVITY;
-		render.setModelTransform(rotationFromInput*translateFromInput*translateToOrigin);
+		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 		//
 		//
 		// Put your code for a translation in the z direction here.
@@ -136,10 +136,10 @@ private:
 		// Put your code for an incremental rotation here.  
 		//
 		//
-		if(spinning)
+		if(spinning){
 			rotationFromInput = rotationSpinStep*rotationFromInput;
-
-		render.setModelTransform(rotationFromInput*translateToOrigin);
+			render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
+		}
 	}
 
 	void handleEvents()
