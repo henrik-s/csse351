@@ -44,7 +44,6 @@ public:
 			App->SetActive();
 			float targetFrameTime = 1.0f/(float)TARGET_FPS;
 			float sleepTime = targetFrameTime - App->GetFrameTime();
-			printf("42");
 			if(sleepTime > 0)
 				sf::Sleep(sleepTime);
 			spinCube();
@@ -82,12 +81,35 @@ private:
 		
 		//computes the appropriate rotation data and stores in phi and axis
 		trackball.getRotation(phi, axis, oldPos, newPos);
+		printf("%.2f\n", phi);
+		printf("%.2f, %.2f, %.2f\n", axis.x, axis.y, axis.z);
+		float p = sqrt(pow(axis.x,2)+pow(axis.y,2)+pow(axis.z,2));
+		glm::vec3 w = glm::vec3(axis.x/p, axis.y/p, axis.z/p);
+		glm::vec3 t= glm::vec3(1, w.y, w.z);
+		if(w.x > w.y && w.z > w.y)
+			t = glm::vec3(w.x, 1, w.z);
+		if(w.x > w.z && w.y > w.z)
+			t = glm::vec3(w.x, w.y, 1);
 		
+		glm::vec3 cross = glm::cross(t, w);
+		float c = sqrt(pow(cross.x,2)+pow(cross.y,2)+pow(cross.z,2));
+		glm::vec3 u = glm::vec3(cross.x/c, cross.y/c, cross.z/c);
+		glm::vec3 v = glm::cross(w, u);
+
+		glm::mat4 r1 = glm::mat4(glm::vec4(w, 0),glm::vec4(u, 0),glm::vec4(v,0),glm::vec4(0,0, 0, 1));
+		glm::mat4 r2 = glm::mat4(cos(phi), -sin(phi), 0, 0,  sin(phi), cos(phi),0,0,0,0, 0, 0, 0, 0,  0, 1);
+		glm::mat4 r3 = glm::transpose(r1);
+		glm::mat4 r4 =  r1*r2;
+		render.setModelTransform(r4);
+		render.setModelTransform(r3);
+		
+
 		//
 		//
 		// Put your code for a rotation of phi about axis here.
 		//
 		//
+
 	}
 	
 	void updateXYTranslate(glm::ivec2 & oldPos, glm::ivec2 & newPos)
