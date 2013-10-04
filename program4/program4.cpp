@@ -97,7 +97,10 @@ private:
 		// Put your code for a translation in the x,y direction here.
 		//
 		//
-
+		float newXVal = newPos.x - oldPos.x;
+		float newYVal = newPos.y - oldPos.y;
+		translateFromInput[3][0] += newXVal*XY_SENSITIVITY;
+		translateFromInput[3][1] -= newYVal*XY_SENSITIVITY;
 		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 	}
 	
@@ -109,6 +112,8 @@ private:
 		// Put your code for a translation in the z direction here.
 		//
 		//
+		float newZVal = oldPos.y - newPos.y;
+		translateFromInput[3][2] += newZVal*Z_SENSITIVITY;
 		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 	}
 	
@@ -191,18 +196,17 @@ private:
 				{
 					buttonDown[0] = false;
 					spinning=true;
+					timeSinceMotion = motionClock.GetElapsedTime();
+					float maxTime = 1.0f/(float)TARGET_FPS * TIME_WINDOW;
+					if(timeSinceMotion > maxTime)
+						spinning = false;
 				}
 				if(Event.MouseButton.Button == sf::Mouse::Right)
 					buttonDown[1] = false;
 				if(Event.MouseButton.Button == sf::Mouse::Middle)
 					buttonDown[2] = false;
 				if(Event.MouseButton.Button == sf::Mouse::Left && shiftDown)
-					buttonDown[2] = false;
-				
-				timeSinceMotion = motionClock.GetElapsedTime();
-				float maxTime = 1.0f/(float)TARGET_FPS * TIME_WINDOW;
-				if(timeSinceMotion > maxTime)
-					spinning = false;
+					buttonDown[2] = false;				
 			}
 			
 			if (Event.Type == sf::Event::MouseMoved && (buttonDown[0] || buttonDown[1] || buttonDown[2]) )
