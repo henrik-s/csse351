@@ -44,6 +44,7 @@ public:
 			App->SetActive();
 			float targetFrameTime = 1.0f/(float)TARGET_FPS;
 			float sleepTime = targetFrameTime - App->GetFrameTime();
+			printf("42");
 			if(sleepTime > 0)
 				sf::Sleep(sleepTime);
 			spinCube();
