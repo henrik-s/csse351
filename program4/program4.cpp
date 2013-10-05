@@ -38,7 +38,7 @@ size to match the size of the window.
 
 Authors:
 Scott Harris
-Hendrik Sohlberg
+Henrik Sohlberg
 
 Date:
 October 4th 2013
@@ -123,44 +123,54 @@ private:
 
 	}
 	
+
+	/**
+	Update the X and Y values in the translation matrix using two vectors,
+	the old and the new values of x and y generated from the track ball output. 
+	*/
 	void updateXYTranslate(glm::ivec2 & oldPos, glm::ivec2 & newPos)
 	{
-
-		#define XY_SENSITIVITY 0.006f  //may be helpful to reduce transform amount
-		//
-		//
-		// Put your code for a translation in the x,y direction here.
-		//
-		//
+		//lower the sensitivity for the track ball
+		#define XY_SENSITIVITY 0.006f 
+		//changes in X and Y coordinates
 		float newXVal = newPos.x - oldPos.x;
 		float newYVal = newPos.y - oldPos.y;
+		//update the previous translation cells with the changes
 		translateFromInput[3][0] += newXVal*XY_SENSITIVITY;
 		translateFromInput[3][1] -= newYVal*XY_SENSITIVITY;
+		//apply to cube
 		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 	}
-	
+
+	/**
+	Update the Z value in the translation matrix using two vectors,
+	the old and the new values of x and y generated from the track ball output.
+	We can use either the changes on the x-axis or the y-axis, dependent on how
+	we want it to change for the mouse movement. For mouse-wheel, Y is used.
+	*/
 	void updateZTranslate(glm::ivec2 & oldPos, glm::ivec2 & newPos)
 	{
-		#define Z_SENSITIVITY 0.006f //may be helpful to reduce transform amount
-		//
-		//
-		// Put your code for a translation in the z direction here.
-		//
-		//
+		//lower the sensitivity for the track ball
+		#define Z_SENSITIVITY 0.006f
+		//changes in Y coordinate
 		float newZVal = oldPos.y - newPos.y;
+		//update the previous translation cell with the change
 		translateFromInput[3][2] += newZVal*Z_SENSITIVITY;
+		//apply to cube
 		render.setModelTransform(translateFromInput*rotationFromInput*translateToOrigin);
 	}
 	
+	/**
+	Update the aspect ratio upon screen size changes to keep the
+	cube´s proportions.
+	*/
 	void updateAspectRatio(int const & newWidth, int const & newHeight)
 	{
-		//
-		//
-		// Put your code to adjust for the change in viewport here.
-		//
-		//
+		//create a new perspective matrix using the new aspect ratio
 		glm::mat4 P = glm::perspective(60.0f, (float)newWidth/(float)newHeight, 0.1f, 100.0f);
+		//apply to rendering
 		render.setProjectionTransform(P);
+		//also update the size of the track ball interface
 		trackball.setSize(newWidth, newHeight);
 	}
 	/**
@@ -242,7 +252,10 @@ private:
 				if(Event.MouseButton.Button == sf::Mouse::Middle)
 					buttonDown[2] = false;
 				if(Event.MouseButton.Button == sf::Mouse::Left && shiftDown)
-					buttonDown[2] = false;				
+					buttonDown[2] = false;	
+
+				// Moved code to inside the "left mouse button released" if clause
+				// to keep spinning if Mouse2 or 3 is pressed and released			
 			}
 			
 			if (Event.Type == sf::Event::MouseMoved && (buttonDown[0] || buttonDown[1] || buttonDown[2]) )
