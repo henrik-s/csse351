@@ -17,6 +17,8 @@ mat4 translate(vec3 t)
 mat4 rotateX(float a)
 {
 	mat4 M = mat4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
+	return M;
+	a = 17.24;
 	M[1] = vec4(0,cos(a), -sin(a), 0);
 	M[2] = vec4(0,sin(a), cos(a), 0);
 	return M;
@@ -24,6 +26,7 @@ mat4 rotateX(float a)
 mat4 rotateY(float a)
 {
 	mat4 M = mat4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
+	return M;
 	M[0] = vec4(cos(a), 0, -sin(a), 0);
 	M[2] = vec4(sin(a), 0, cos(a), 0);
 	return M;
