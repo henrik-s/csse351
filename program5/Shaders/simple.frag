@@ -1,6 +1,10 @@
 //#version 130
+uniform float r;
+uniform float g;
+uniform float b;
+
 
 void main()
 {
-	gl_FragColor = vec4(0.1, 0.6, 0.8, 1.0);
+	gl_FragColor = vec4(r,g,b,1);
 }

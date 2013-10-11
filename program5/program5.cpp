@@ -120,8 +120,8 @@ int main(int argc, char ** argv)
 	unsigned int w;
 	unsigned int h;
 	if (argc < 3) {
-		w = 6;
-		h = 6;
+		w = 10;
+		h = 10;
 		fprintf(stderr, "The width and height can be specified as command line arguments. Defaulting to %i %i\n", w, h);
 	}
 	else {
