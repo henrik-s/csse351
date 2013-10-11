@@ -106,10 +106,11 @@ public:
 	
 	float getUnitSize()
 	{ return 1.0f; }
-	
-private:
 	vector<GLfloat> positions;
 	vector<GLuint> elements;
+	
+private:
+
 };
 
 #endif
