@@ -1,2 +1,4 @@
 *.user
 *.ncb
+*.suo
+program5/Debug/*

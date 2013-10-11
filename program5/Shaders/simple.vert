@@ -8,5 +8,5 @@ attribute vec3 pos;
 void main()
 {	
 	vec4 p = vec4(pos, 1);
-	gl_Position = M*p;
+	gl_Position = M*p;	
 }

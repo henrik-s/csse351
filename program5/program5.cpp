@@ -89,6 +89,25 @@ private:
 				render.generateMaze(step);
 				step++;
 			}
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Up)
+			{
+				render.move('u');
+			}
+
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Down)
+			{
+				render.move('d');
+			}
+
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Left)
+			{
+				render.move('l');
+			}
+
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Right)
+			{
+				render.move('r');
+			}
 		}
 	}
 };

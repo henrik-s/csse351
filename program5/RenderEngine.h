@@ -30,6 +30,8 @@ public:
 	{
 		this->w = w;
 		this->h = h;
+
+		movement = false;
 		
 		setupGlew();
 		setupShader();
@@ -48,6 +50,7 @@ public:
 		//use shader
 		glUseProgram(shaderProg);
 		glm::mat4 T = P;
+		updateMovement();
 		glUniformMatrix4fv(matSlot, 1, GL_FALSE, &T[0][0]);
 		
 		//draw
@@ -58,6 +61,43 @@ public:
 		glBindVertexArray(0);
 		glUseProgram(0);
 		checkGLError("display");
+	}
+
+	void move(char direction) {
+		movement = true;
+		switch(direction) {
+			case 'l':
+				xMove = 10;
+				xChange = -0.01;
+				break;
+			case 'r':
+				xMove = 10;
+				xChange = 0.01;
+				break;
+			case 'u':
+				yMove = 10;
+				yChange = 0.01;
+				break;
+			case 'd':
+				yMove = 10;
+				yChange = -0.01;
+				break;
+			}
+	}
+	void updateMovement() {
+		if (!movement)
+			return;
+		if (xMove > 0) {
+			P[3][0] += xChange;
+			xMove--;
+		}
+		if (yMove > 0) {
+			P[3][2] += yChange;
+			printf("%.3f\n", P[3][2]);
+			yMove--;
+		}
+
+
 	}
 	
 	void reshape(int const & newWidth, int const & newHeight)
@@ -81,6 +121,11 @@ public:
 private:
 	MazeModel model;
 	bool initialized;
+
+
+	float xChange, yChange, zChange;
+	int xMove, yMove;
+	bool movement;
 
 	GLuint shaderProg;
 
