@@ -1,5 +1,5 @@
 //Replace with your usernames!
-#define printusers() printf("Program by USER1+USER2\n");
+#define printusers() printf("Program by HARRISSA+sohlbehd\n");
 
 #define GLEW_STATIC
 #include <stdio.h>
@@ -18,11 +18,22 @@
 #define TARGET_FPS 30                // controls spin update rate
 #define TIME_WINDOW 3                // number of frames motion is valid after release
 
+/**
+Problem: Create a 3D maze with a floor that can be traversed
+easily and provide a top down look at the maze.
 
-class Program4
+Solution: Use current "elements" maze and create a horizontal
+wall model and a vertical wall model. Draw these walls accordingly
+to each horizontal and vertical wall in the maze. After that, draw
+the floor and use transformation matrices to traverse the maze and 
+change the perspective. 
+
+Authors: Scott Harris and Henrik Sohlberg
+*/
+class Program5
 {
 public:
-	Program4(unsigned int const & w, unsigned int const & h)
+	Program5(unsigned int const & w, unsigned int const & h)
 	{
 		App = new sf::Window(sf::VideoMode(RESOLUTION, RESOLUTION, 32), "program5");
 		render.init(w, h);
@@ -42,7 +53,7 @@ public:
 		}
 	}
 	
-	~Program4()
+	~Program5()
 	{
 	}
 	
@@ -148,7 +159,7 @@ int main(int argc, char ** argv)
 		h = atoi(argv[2]);
 	}
 	
-	Program4 prog(w, h);
+	Program5 prog(w, h);
 	
     return EXIT_SUCCESS;
 }
