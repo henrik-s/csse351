@@ -1,7 +1,6 @@
 //#version 130
 
 uniform mat4 M;
-uniform float time;
 
 uniform float transInX;
 uniform float transInY;

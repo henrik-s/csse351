@@ -52,6 +52,9 @@ public:
 		initialized = true;
 	}
 
+	/**
+	Safe projection, camera and transition matrix and swap
+	*/
 	void toggleMap() {
 		if (!mapToggled) {
 			this->Pswap = P;
@@ -77,6 +80,9 @@ public:
 		}
 	}
 
+	/**
+	Print help text
+	*/
 	void printHelp() {
 		printf("\n*** Keys ***\n");
 		printf("W = Forward\n");
@@ -109,12 +115,10 @@ public:
 
 		glm::mat4 T = P*C*M;
 
-
 		updateMovement();
 		glUniformMatrix4fv(matSlot, 1, GL_FALSE, &T[0][0]);
 		
 		//draw
-		glUniform1f(timeSlot, rotation);
 		glBindVertexArray(vertexArray);
 		glUniform1f(rSlot, 1);
 		glUniform1f(gSlot, 1);
@@ -179,6 +183,9 @@ public:
 		checkGLError("display");
 	}
 
+	/**
+	Call the specific move method for a specific key
+	*/
 	void move(char dir) {
 		movement = true;
 		switch(dir) {
@@ -203,6 +210,9 @@ public:
 			}
 	}
 
+	/**
+	Move up, take into consideration the direction the player is facing
+	*/
 	void wMove() {
 		switch(direction) {
 			case 'N':
@@ -223,7 +233,11 @@ public:
 				break;
 			}
 	}
-		void sMove() {
+
+	/**
+	Move down, take into consideration the direction the player is facing
+	*/
+	void sMove() {
 		switch(direction) {
 			case 'N':
 				xMove = 10;
@@ -243,6 +257,10 @@ public:
 				break;
 			}
 	}
+
+	/**
+	Strafe left, take into consideration the direction the player is facing
+	*/
 	void aMove() {
 		switch(direction) {
 			case 'N':
@@ -263,6 +281,11 @@ public:
 				break;
 			}
 	}
+
+
+	/**
+	Strafe right, take into consideration the direction the player is facing
+	*/
 	void dMove() {
 		switch(direction) {
 			case 'N':
@@ -284,6 +307,10 @@ public:
 			}
 	}
 
+
+	/**
+	Turn 90 degrees left or right, and update the direction
+	*/
 	void turn(float angle) {
 		if (mapToggled) {
 			if (angle > 0) {			
@@ -303,9 +330,12 @@ public:
 		this->R = glm::mat4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
 		R[0] = glm::vec4(cos(angle), 0, -sin(angle), 0);
 		R[2] = glm::vec4(sin(angle), 0, cos(angle), 0);
-		this->P = this->P*R;
+		this->P = this->P*R; // update projection
 	}
 
+	/**
+	Update direction upon left rotation
+	*/
 	void turnLeft() {
 		if (direction == 'N')
 			direction = 'W';
@@ -316,6 +346,9 @@ public:
 		else if (direction == 'E')
 			direction = 'N';
 	}
+	/**
+	Update direction upon left rotation
+	*/
 	void turnRight() {
 		if (direction == 'N')
 			direction = 'E';
@@ -327,6 +360,9 @@ public:
 			direction = 'N';
 	}
 
+	/**
+	Create a smooth movement in x, y, or z axis
+	*/
 	void updateMovement() {
 		if (!movement)
 			return;
@@ -386,7 +422,6 @@ private:
 	GLint matSlot;
 	GLint transSlotX;
 	GLint transSlotY;
-	GLint timeSlot;
 	GLint rSlot;
 	GLint gSlot;
 	GLint bSlot;
@@ -429,7 +464,6 @@ private:
 		matSlot =      glGetUniformLocation(shaderProg, "M");
 		transSlotX = glGetUniformLocation(shaderProg, "transInX");
 		transSlotY = glGetUniformLocation(shaderProg, "transInY");
-		timeSlot = glGetUniformLocation(shaderProg, "time");
 		rSlot = glGetUniformLocation(shaderProg, "r");
 		gSlot = glGetUniformLocation(shaderProg, "g");
 		bSlot = glGetUniformLocation(shaderProg, "b");
