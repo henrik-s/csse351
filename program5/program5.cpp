@@ -27,6 +27,7 @@ public:
 		App = new sf::Window(sf::VideoMode(RESOLUTION, RESOLUTION, 32), "program5");
 		render.init(w, h);
 		step = 2;
+		render.printHelp();
 		
 		while (App->IsOpened())
 		{			
@@ -89,24 +90,42 @@ private:
 				render.generateMaze(step);
 				step++;
 			}
-			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Up)
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::W)
 			{
-				render.move('u');
+				render.move('w');
 			}
 
-			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Down)
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::S)
+			{
+				render.move('s');
+			}
+
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::A)
+			{
+				render.move('a');
+			}
+
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::D)
 			{
 				render.move('d');
 			}
 
-			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Left)
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Q)
 			{
-				render.move('l');
+				render.move('q');
 			}
 
-			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::Right)
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::E)
 			{
-				render.move('r');
+				render.move('e');
+			}
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::M)
+			{
+				render.toggleMap();
+			}
+			if(Event.Type == sf::Event::KeyPressed && Event.Key.Code == sf::Key::H)
+			{
+				render.printHelp();
 			}
 		}
 	}

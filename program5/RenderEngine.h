@@ -1,5 +1,8 @@
 #ifndef __RENDERENGINE
 #define __RENDERENGINE
+#define RESOLUTION 512
+
+#define PI 3.14.f
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -16,7 +19,14 @@ public:
 	RenderEngine()
 	{
 		initialized = false;
-		this->P = glm::ortho(-1, 1, -1, 1);
+		glm::vec3 e, c, u, axis;
+		e = glm::vec3(-10,5,0.3);
+		c = glm::vec3(0,5,0.3);
+		u = glm::vec3(0,0,1);
+		this->C = glm::lookAt(e, c, u);
+		this->M = glm::mat4(1);
+		direction = 'N';
+		mapToggled = false;
 	}
 
 	~RenderEngine()
@@ -42,10 +52,52 @@ public:
 		initialized = true;
 	}
 
+	void toggleMap() {
+		if (!mapToggled) {
+			this->Pswap = P;
+			this->Cswap = C;
+			this->Mswap = M;
+			directionSwap = direction;
+			glm::vec3 e, c, u, axis;
+			e = glm::vec3(11/2,11/2,20);
+			c = glm::vec3(11/2,11/2,0);
+			u = glm::vec3(1,0,0);
+			this->C = glm::lookAt(e, c, u);
+			this->M = glm::mat4(1);			
+			this->P = glm::perspective(60.0f, (float)RESOLUTION/(float)RESOLUTION, 0.1f, 200.0f);
+			direction = 'N';
+			mapToggled = true;
+		}
+		else {			
+			this->P = Pswap;
+			this->C = Cswap;
+			this->M = Mswap;			
+			direction = directionSwap;
+			mapToggled = false;
+		}
+	}
+
+	void printHelp() {
+		printf("\n*** Keys ***\n");
+		printf("W = Forward\n");
+		printf("A = Strafe left\n");
+		printf("S = Backward\n");
+		printf("D = Strafe right\n");
+		printf("Q = Turn quickly left\n");
+		printf("E = Turn quickly right\n");
+		printf("\n");
+		printf("Spacebar = Generate new maze\n");
+		printf("H = Display this help message\n");
+		printf("M = Toggle on/off map mode\n");
+		printf("\n");
+		printf("--- Map mode ---\n");
+		printf("Move around using W,A,S,D\n");
+		printf("Q = Zoom out\n");
+		printf("E = Zoom in\n");
+	}
+
 	void display(bool pickingEnabled=false)
 	{
-		GLfloat currentTime;
-		currentTime = clk.GetElapsedTime();
 		glEnable(GL_DEPTH_TEST);
 
 		//clear the old frame
@@ -54,12 +106,15 @@ public:
 		
 		//use shader
 		glUseProgram(shaderProg);
-		glm::mat4 T = P;
+
+		glm::mat4 T = P*C*M;
+
+
 		updateMovement();
 		glUniformMatrix4fv(matSlot, 1, GL_FALSE, &T[0][0]);
 		
 		//draw
-		glUniform1f(timeSlot, currentTime);
+		glUniform1f(timeSlot, rotation);
 		glBindVertexArray(vertexArray);
 		glUniform1f(rSlot, 1);
 		glUniform1f(gSlot, 1);
@@ -114,6 +169,8 @@ public:
 			}
 		}
 		//cleanup
+		if(rotation>0)
+			rotation = rotation - 0.1;
 		glUniform1f(transSlotX, 0);
 		glUniform1f(transSlotY, 0);
 		glUniform1f(rSlot,0);
@@ -122,41 +179,169 @@ public:
 		checkGLError("display");
 	}
 
-	void move(char direction) {
+	void move(char dir) {
 		movement = true;
-		switch(direction) {
-			case 'l':
-				xMove = 10;
-				xChange = -0.01;
+		switch(dir) {
+			case 'w':
+				wMove();
 				break;
-			case 'r':
-				xMove = 10;
-				xChange = 0.01;
+			case 's':
+				sMove();
 				break;
-			case 'u':
-				yMove = 10;
-				yChange = 0.01;
+			case 'e':
+				turn(PI/2);
+				break;
+			case 'q':
+				turn(-PI/2);
 				break;
 			case 'd':
-				yMove = 10;
-				yChange = -0.01;
+				dMove();
+				break;
+			case 'a':
+				aMove();
 				break;
 			}
 	}
+
+	void wMove() {
+		switch(direction) {
+			case 'N':
+				xMove = 10;
+				xChange = -0.05;
+				break;
+			case 'S':
+				xMove = 10;
+				xChange = 0.05;
+				break;
+			case 'W':
+				yMove = 10;
+				yChange = -0.05;
+				break;
+			case 'E':
+				yMove = 10;
+				yChange = 0.05;
+				break;
+			}
+	}
+		void sMove() {
+		switch(direction) {
+			case 'N':
+				xMove = 10;
+				xChange = 0.05;
+				break;
+			case 'S':
+				xMove = 10;
+				xChange = -0.05;
+				break;
+			case 'W':
+				yMove = 10;
+				yChange = 0.05;
+				break;
+			case 'E':
+				yMove = 10;
+				yChange = -0.05;
+				break;
+			}
+	}
+	void aMove() {
+		switch(direction) {
+			case 'N':
+				yMove = 10;
+				yChange = -0.05;
+				break;
+			case 'S':
+				yMove = 10;
+				yChange = 0.05;
+				break;
+			case 'W':
+				xMove = 10;
+				xChange = 0.05;
+				break;
+			case 'E':
+				xMove = 10;
+				xChange = -0.05;
+				break;
+			}
+	}
+	void dMove() {
+		switch(direction) {
+			case 'N':
+				yMove = 10;
+				yChange = 0.05;
+				break;
+			case 'S':
+				yMove = 10;
+				yChange = -0.05;
+				break;
+			case 'W':
+				xMove = 10;
+				xChange = -0.05;
+				break;
+			case 'E':
+				xMove = 10;
+				xChange = 0.05;
+				break;
+			}
+	}
+
+	void turn(float angle) {
+		if (mapToggled) {
+			if (angle > 0) {			
+				zMove = 10;
+				zChange = 0.1;
+			}
+			else {		
+				zMove = 10;
+				zChange = -0.1;			
+			}
+			return;
+		}
+		if (angle > 0)
+			turnRight();
+		else
+			turnLeft();
+		this->R = glm::mat4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
+		R[0] = glm::vec4(cos(angle), 0, -sin(angle), 0);
+		R[2] = glm::vec4(sin(angle), 0, cos(angle), 0);
+		this->P = this->P*R;
+	}
+
+	void turnLeft() {
+		if (direction == 'N')
+			direction = 'W';
+		else if (direction == 'W')
+			direction = 'S';
+		else if (direction == 'S')
+			direction = 'E';
+		else if (direction == 'E')
+			direction = 'N';
+	}
+	void turnRight() {
+		if (direction == 'N')
+			direction = 'E';
+		else if (direction == 'E')
+			direction = 'S';
+		else if (direction == 'S')
+			direction = 'W';
+		else if (direction == 'W')
+			direction = 'N';
+	}
+
 	void updateMovement() {
 		if (!movement)
 			return;
 		if (xMove > 0) {
-			P[3][0] += xChange;
+			M[3][0] += xChange;
 			xMove--;
 		}
 		if (yMove > 0) {
-			P[3][2] += yChange;
-			printf("%.3f\n", P[3][2]);
+			M[3][1] += yChange;
 			yMove--;
+		}		
+		if (zMove > 0) {
+			M[3][2] += zChange;
+			zMove--;
 		}
-
-
 	}
 	
 	void reshape(int const & newWidth, int const & newHeight)
@@ -170,9 +355,7 @@ public:
 		model = MazeModel(mazeLayout);
 		wallHModel = WallH(mazeLayout);
 		wallVModel = WallV(mazeLayout);
-		
-		this->P = glm::ortho(-model.getUnitSize(), (w+1)*model.getUnitSize(), -model.getUnitSize(), (h+1)*model.getUnitSize());
-	
+		this->P = glm::perspective(60.0f, (float)RESOLUTION/(float)RESOLUTION, 0.1f, 200.0f);
 		if(initialized)
 			rebuildBuffers();
 		else
@@ -187,10 +370,13 @@ private:
 
 
 	float xChange, yChange, zChange;
-	int xMove, yMove;
-	bool movement;
+	int xMove, yMove, zMove;
+	bool mapToggled, movement;
+	char direction, directionSwap;
 
 	GLuint shaderProg;
+
+	GLfloat rotation;
 
 	GLuint positionBuffer;
 	GLuint elementBuffer;
@@ -211,6 +397,13 @@ private:
 	unsigned int h;
 	
 	glm::mat4 P;
+	glm::mat4 R;
+	glm::mat4 C;
+	glm::mat4 M;
+
+	glm::mat4 Pswap;
+	glm::mat4 Cswap;
+	glm::mat4 Mswap;
 
 	void setupGlew()
 	{
