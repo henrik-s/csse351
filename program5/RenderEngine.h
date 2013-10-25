@@ -12,7 +12,20 @@
 #include "MazeModel.h"
 #include "WallH.h"
 #include "WallV.h"
-
+class Position {
+public:
+	int x;
+	int y;
+	Position(){}
+	Position(int x, int y) {
+		this->x = x;
+		this->y = y;
+	}
+	void printPos() {
+		printf("Camera position: (%d, %d)\n", x, y);
+	}
+private:
+};
 class RenderEngine
 {
 public:
@@ -27,9 +40,8 @@ public:
 		this->M = glm::mat4(1);
 		direction = 'N';
 		mapToggled = false;
-		this.position.x = -10;
-		this.position.y = 5;
-		position.printPos();
+		pos = Position(-10, 5);
+		pos.printPos();
 	}
 
 	~RenderEngine()
@@ -225,7 +237,7 @@ public:
 				aMove();
 				break;
 			}
-		position.printPos();
+		pos.printPos();
 	}
 
 	/**
@@ -234,22 +246,22 @@ public:
 	void wMove() {
 		switch(direction) {
 			case 'N':
-				position.x++;
+				pos.x++;
 				xMove = 10;
 				xChange = -0.1;
 				break;
 			case 'S':
-				position.x--;
+				pos.x--;
 				xMove = 10;
 				xChange = 0.1;
 				break;
 			case 'W':			
-				position.y++;
+				pos.y++;
 				yMove = 10;
 				yChange = -0.1;
 				break;
 			case 'E':
-				position.y--;
+				pos.y--;
 				yMove = 10;
 				yChange = 0.1;
 				break;
@@ -586,14 +598,6 @@ private:
 };
 
 
-class Position {
-public:
-	int x;
-	int y;
 
-	void printPos() {
-		printf("Camera position: (%d, %d)\n", x, y);
-	}
-};
 
 #endif
