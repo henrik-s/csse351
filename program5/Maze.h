@@ -41,6 +41,8 @@ public:
 	
 	bool unvisited() const
 	{ return (c&UNVISITED_CELL)==UNVISITED_CELL; }
+
+
 	
 private:
 	unsigned char c;
@@ -81,6 +83,25 @@ public:
 	{ return getCell(x,y).leftBlocked(); }
 	bool rightBlocked(unsigned int const & x, unsigned int const & y) const
 	{ return getCell(x,y).rightBlocked(); }
+
+	
+	void getLeftOpening(unsigned int & x, unsigned int & y) const
+	{
+		x = 0; //x is always 0
+		
+		for(y=0; y<height; y++)
+			if( !getCell(x,y).leftBlocked() )
+				return;
+	}
+
+	void getRightOpening(unsigned int & x, unsigned int & y) const
+	{
+		x = width-1; //x is always 0
+		
+		for(y=0; y<height; y++)
+			if( !getCell(x,y).rightBlocked() )
+				return;
+	}
 	
 private:
 	unsigned int width;

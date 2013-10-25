@@ -1,5 +1,12 @@
-//Replace with your usernames!
-#define printusers() printf("Program by HARRISSA+sohlbehd\n");
+/**
+Authors:
+Scott Harris
+Henrik Sohlberg
+
+Date:
+October 11th 2013
+*/
+#define printusers() printf("Program by SOHLBEHD+HARRISSA\n");
 
 #define GLEW_STATIC
 #include <stdio.h>

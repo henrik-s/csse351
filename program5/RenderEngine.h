@@ -53,7 +53,7 @@ public:
 	}
 
 	/**
-	Safe projection, camera and transition matrix and swap
+	Save projection, camera and transition matrix and swap
 	*/
 	void toggleMap() {
 		if (!mapToggled) {
@@ -91,7 +91,6 @@ public:
 		printf("D = Strafe right\n");
 		printf("Q = Turn quickly left\n");
 		printf("E = Turn quickly right\n");
-		printf("Warning: Turning and then\n generating a new maze will\n throw off control. Please restart\n if necessary\n");
 		printf("\n");
 		printf("Spacebar = Generate new maze\n");
 		printf("H = Display this help message\n");
@@ -101,6 +100,7 @@ public:
 		printf("Move around using W,A,S,D\n");
 		printf("Q = Zoom out\n");
 		printf("E = Zoom in\n");
+
 		
 	}
 
@@ -402,14 +402,24 @@ public:
 	void generateMaze(unsigned int const & seed = 1)
 	{
 		Maze mazeLayout(w, h, seed);
+
+		unsigned int x,y;
+		bool retry = false;
+		mazeLayout.getLeftOpening(x,y);
+		if (x == 0 && y == 0) // Micah, don't worry about it, Devon helped us with this one
+			retry = true;
+
 		model = MazeModel(mazeLayout);
 		wallHModel = WallH(mazeLayout);
 		wallVModel = WallV(mazeLayout);
-		this->P = glm::perspective(60.0f, (float)RESOLUTION/(float)RESOLUTION, 0.1f, 200.0f);
 		if(initialized)
 			rebuildBuffers();
-		else
+		else {
+			this->P = glm::perspective(60.0f, (float)RESOLUTION/(float)RESOLUTION, 0.1f, 200.0f);
 			setupBuffers();
+		}
+		if (retry)
+			generateMaze(2);
 	}
 
 private:
