@@ -91,6 +91,7 @@ public:
 		printf("D = Strafe right\n");
 		printf("Q = Turn quickly left\n");
 		printf("E = Turn quickly right\n");
+		printf("Warning: Turning and then\n generating a new maze will\n throw off control. Please restart\n if necessary\n");
 		printf("\n");
 		printf("Spacebar = Generate new maze\n");
 		printf("H = Display this help message\n");
@@ -100,6 +101,7 @@ public:
 		printf("Move around using W,A,S,D\n");
 		printf("Q = Zoom out\n");
 		printf("E = Zoom in\n");
+		
 	}
 
 	void display(bool pickingEnabled=false)
@@ -120,18 +122,26 @@ public:
 		
 		//draw
 		glBindVertexArray(vertexArray);
+
+		//upload uniforms for the color of the floor
 		glUniform1f(rSlot, 1);
 		glUniform1f(gSlot, 1);
 		glUniform1f(bSlot, 1);
-		glDrawElements(GL_LINES, model.getElementCount(), GL_UNSIGNED_INT, 0);
+		
+		//glDrawElements(GL_LINES, model.getElementCount(), GL_UNSIGNED_INT, 0);
 		int v = model.getVertexCount();
+		//draw floor
 		glDrawArrays(GL_TRIANGLE_FAN,v+36,4);
+
+		//this draws the horizontal walls
 		for(int i = 0; i < model.getElementCount(); i+=2){
 			if(model.elements[i]-model.elements[i+1]==1||model.elements[i]-model.elements[i+1]==-1){
 				int e = model.elements[i];
+				//colors
 				glUniform1f(rSlot, model.positions[3*e]/sqrt((double) model.getElementCount())+.1);
 				glUniform1f(gSlot, model.positions[3*e+1]/sqrt((double) model.getElementCount()));
 				glUniform1f(bSlot, model.positions[3*e+2]/sqrt((double) model.getElementCount()));
+				//location of wall
 				glUniform1f(transSlotX, model.positions[3*e]-.05);
 				glUniform1f(transSlotY, model.positions[3*e+1]);
 				//bottom
@@ -148,14 +158,16 @@ public:
 				glDrawArrays(GL_TRIANGLE_FAN,v+14,4);
 			}
 		}
+		//this drawas the vertical walls
 		v = model.getVertexCount()+18;
 		for(int i = 0; i < model.getElementCount(); i+=2){
 			if(model.elements[i]-model.elements[i+1]!=1&&model.elements[i]-model.elements[i+1]!=-1){
 				int e = model.elements[i];
-				 
+				 //colors
 				glUniform1f(rSlot, model.positions[3*e+2]/sqrt((double) model.getElementCount()));
 				glUniform1f(gSlot, model.positions[3*e+1]/sqrt((double) model.getElementCount()));
 				glUniform1f(bSlot,model.positions[3*e]/sqrt((double) model.getElementCount())+.1);
+				//location of wall
 				glUniform1f(transSlotX, model.positions[3*e]-.05);
 				glUniform1f(transSlotY, model.positions[3*e+1]);
 				//bottom
