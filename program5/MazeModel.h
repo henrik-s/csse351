@@ -28,6 +28,10 @@ public:
 				positions.push_back(x*unit);
 				positions.push_back(y*unit);
 				positions.push_back(0);
+
+				normals.push_back(x*unit);
+				normals.push_back(y*unit);
+				normals.push_back(0);
 			}
 		}
 		
@@ -78,6 +82,7 @@ public:
 			{
 				elements.push_back( y   *(w+1)+h);
 				elements.push_back((y+1)*(w+1)+h);
+				
 			}
 		}
 		
@@ -89,6 +94,9 @@ public:
 	GLfloat const * getPosition() const
 	{ return &positions[0]; }
 	
+	GLfloat const * getNormals() const
+	{ return &normals[0]; }	
+
 	GLuint const * getElements() const
 	{ return &elements[0]; }
 	
@@ -104,10 +112,14 @@ public:
 	size_t getPositionBytes() const
 	{ return positions.size()*sizeof(GLfloat); }
 	
+	size_t getNormalsBytes() const
+	{ return normals.size()*sizeof(GLfloat); }
+
 	float getUnitSize()
 	{ return 1.0f; }
 	vector<GLfloat> positions;
 	vector<GLuint> elements;
+	vector<GLfloat> normals;
 	
 private:
 

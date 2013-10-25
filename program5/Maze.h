@@ -11,7 +11,7 @@
 
 #define NEW_CELL 0xff
 #define UNVISITED_CELL 0x10
-
+#define PI 3.1415265359
 class Cell
 {
 public:

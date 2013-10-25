@@ -120,6 +120,8 @@ public:
 		updateMovement();
 		glUniformMatrix4fv(matSlot, 1, GL_FALSE, &T[0][0]);
 		
+		float t = clk.GetElapsedTime();
+		glUniform1f(timeSlot, t);
 		//draw
 		glBindVertexArray(vertexArray);
 
@@ -131,7 +133,7 @@ public:
 		//glDrawElements(GL_LINES, model.getElementCount(), GL_UNSIGNED_INT, 0);
 		int v = model.getVertexCount();
 		//draw floor
-		glDrawArrays(GL_TRIANGLE_FAN,v+36,4);
+		glDrawArrays(GL_TRIANGLE_FAN,v+48,4);
 
 		//this draws the horizontal walls
 		for(int i = 0; i < model.getElementCount(); i+=2){
@@ -147,19 +149,19 @@ public:
 				//bottom
 				glDrawArrays(GL_TRIANGLE_FAN,v,4);
 				//right
-				glDrawArrays(GL_TRIANGLE_FAN,v+2,4);
-				//top
 				glDrawArrays(GL_TRIANGLE_FAN,v+4,4);
+				//top
+				glDrawArrays(GL_TRIANGLE_FAN,v+8,4);
 				//left
-				glDrawArrays(GL_TRIANGLE_FAN,v+6,4);
+				glDrawArrays(GL_TRIANGLE_FAN,v+12,4);
 				//front
-				glDrawArrays(GL_TRIANGLE_FAN,v+10,4);
+				glDrawArrays(GL_TRIANGLE_FAN,v+16,4);
 				//back
-				glDrawArrays(GL_TRIANGLE_FAN,v+14,4);
+				glDrawArrays(GL_TRIANGLE_FAN,v+20,4);
 			}
 		}
 		//this drawas the vertical walls
-		v = model.getVertexCount()+18;
+		v = model.getVertexCount()+24;
 		for(int i = 0; i < model.getElementCount(); i+=2){
 			if(model.elements[i]-model.elements[i+1]!=1&&model.elements[i]-model.elements[i+1]!=-1){
 				int e = model.elements[i];
@@ -173,15 +175,15 @@ public:
 				//bottom
 				glDrawArrays(GL_TRIANGLE_FAN,v,4);
 				//right
-				glDrawArrays(GL_TRIANGLE_FAN,v+2,4);
-				//top
 				glDrawArrays(GL_TRIANGLE_FAN,v+4,4);
+				//top
+				glDrawArrays(GL_TRIANGLE_FAN,v+8,4);
 				//left
-				glDrawArrays(GL_TRIANGLE_FAN,v+6,4);
+				glDrawArrays(GL_TRIANGLE_FAN,v+12,4);
 				//front
-				glDrawArrays(GL_TRIANGLE_FAN,v+10,4);
+				glDrawArrays(GL_TRIANGLE_FAN,v+16,4);
 				//back
-				glDrawArrays(GL_TRIANGLE_FAN,v+14,4);
+				glDrawArrays(GL_TRIANGLE_FAN,v+20,4);
 			}
 		}
 		//cleanup
@@ -229,19 +231,19 @@ public:
 		switch(direction) {
 			case 'N':
 				xMove = 10;
-				xChange = -0.05;
+				xChange = -0.1;
 				break;
 			case 'S':
 				xMove = 10;
-				xChange = 0.05;
+				xChange = 0.1;
 				break;
 			case 'W':
 				yMove = 10;
-				yChange = -0.05;
+				yChange = -0.1;
 				break;
 			case 'E':
 				yMove = 10;
-				yChange = 0.05;
+				yChange = 0.1;
 				break;
 			}
 	}
@@ -437,10 +439,13 @@ private:
 	GLfloat rotation;
 
 	GLuint positionBuffer;
+	GLuint normalBuffer;
 	GLuint elementBuffer;
 	GLuint vertexArray;
 
 	GLint positionSlot;
+	GLint normalSlot;
+	GLint timeSlot;
 	GLint matSlot;
 	GLint transSlotX;
 	GLint transSlotY;
@@ -483,6 +488,8 @@ private:
 
 		// Find out where the shader expects the data
 		positionSlot = glGetAttribLocation(shaderProg, "pos");
+		normalSlot = glGetAttribLocation(shaderProg, "norm");
+		timeSlot = glGetUniformLocation(shaderProg, "time");
 		matSlot =      glGetUniformLocation(shaderProg, "M");
 		transSlotX = glGetUniformLocation(shaderProg, "transInX");
 		transSlotY = glGetUniformLocation(shaderProg, "transInY");
@@ -500,7 +507,12 @@ private:
 		all_positions.insert( all_positions.end(), model.positions.begin(), model.positions.end());
 		all_positions.insert( all_positions.end(), wallHModel.positions.begin(), wallHModel.positions.end());
 		all_positions.insert( all_positions.end(), wallVModel.positions.begin(), wallVModel.positions.end());
-		
+
+		vector<GLfloat> all_normals;
+		all_normals.reserve(sizeof(model.normals)+sizeof(wallHModel.normals)+ sizeof(wallVModel.normals));
+		all_normals.insert( all_normals.end(), model.normals.begin(), model.normals.end());
+		all_normals.insert( all_normals.end(), wallHModel.normals.begin(), wallHModel.normals.end());
+		all_normals.insert( all_normals.end(), wallVModel.normals.begin(), wallVModel.normals.end());
 		
 		//setup position buffer
 		glGenBuffers(1, &positionBuffer);
@@ -509,6 +521,11 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		
+		glGenBuffers(1, &normalBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+		glBufferData(GL_ARRAY_BUFFER, model.getNormalsBytes()+wallHModel.getNormalsBytes()+wallVModel.getNormalsBytes(), &all_normals[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 		// now the elements
 		glGenBuffers(1, &elementBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
@@ -522,6 +539,12 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
 		glEnableVertexAttribArray(positionSlot);
 		glVertexAttribPointer(positionSlot, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		
+		glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+		glEnableVertexAttribArray(normalSlot);
+		glVertexAttribPointer(normalSlot, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		
+		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
 		glBindVertexArray(0);
 		
