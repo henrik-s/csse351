@@ -20,13 +20,16 @@ public:
 	{
 		initialized = false;
 		glm::vec3 e, c, u, axis;
-		e = glm::vec3(-10,5,0.3);
-		c = glm::vec3(0,5,0.3);
-		u = glm::vec3(0,0,1);
+		e = glm::vec3(-10,5,0.3);		// Specifies the position of the eye point.
+		c = glm::vec3(0,5,0.3);			// Specifies the position of the reference point.
+		u = glm::vec3(0,0,1);			// Specifies the direction of the up vector.
 		this->C = glm::lookAt(e, c, u);
 		this->M = glm::mat4(1);
 		direction = 'N';
 		mapToggled = false;
+		this.position.x = -10;
+		this.position.y = 5;
+		position.printPos();
 	}
 
 	~RenderEngine()
@@ -222,6 +225,7 @@ public:
 				aMove();
 				break;
 			}
+		position.printPos();
 	}
 
 	/**
@@ -230,18 +234,22 @@ public:
 	void wMove() {
 		switch(direction) {
 			case 'N':
+				position.x++;
 				xMove = 10;
 				xChange = -0.1;
 				break;
 			case 'S':
+				position.x--;
 				xMove = 10;
 				xChange = 0.1;
 				break;
-			case 'W':
+			case 'W':			
+				position.y++;
 				yMove = 10;
 				yChange = -0.1;
 				break;
 			case 'E':
+				position.y--;
 				yMove = 10;
 				yChange = 0.1;
 				break;
@@ -428,7 +436,7 @@ private:
 	WallV wallVModel;
 	bool initialized;
 
-
+	Position pos;
 	float xChange, yChange, zChange;
 	int xMove, yMove, zMove;
 	bool mapToggled, movement;
@@ -574,6 +582,17 @@ private:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
 		glBindVertexArray(0);
 		checkGLError("rebuild");
+	}
+};
+
+
+class Position {
+public:
+	int x;
+	int y;
+
+	void printPos() {
+		printf("Camera position: (%d, %d)\n", x, y);
 	}
 };
 
