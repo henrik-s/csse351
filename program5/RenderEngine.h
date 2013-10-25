@@ -274,20 +274,24 @@ public:
 	void sMove() {
 		switch(direction) {
 			case 'N':
+				pos.y++;
 				xMove = 10;
-				xChange = 0.05;
+				xChange = 0.1;
 				break;
 			case 'S':
+				pos.y--;
 				xMove = 10;
-				xChange = -0.05;
+				xChange = -0.1;
 				break;
 			case 'W':
+				pos.x++;
 				yMove = 10;
-				yChange = 0.05;
+				yChange = 0.1;
 				break;
 			case 'E':
+				pos.x--;
 				yMove = 10;
-				yChange = -0.05;
+				yChange = -0.1;
 				break;
 			}
 	}
@@ -298,20 +302,24 @@ public:
 	void aMove() {
 		switch(direction) {
 			case 'N':
+				pos.y--;
 				yMove = 10;
-				yChange = -0.05;
+				yChange = -0.1;
 				break;
 			case 'S':
+				pos.y++;
 				yMove = 10;
-				yChange = 0.05;
+				yChange = 0.1;
 				break;
 			case 'W':
+				pos.x--;
 				xMove = 10;
-				xChange = 0.05;
+				xChange = 0.1;
 				break;
 			case 'E':
+				pos.x++;
 				xMove = 10;
-				xChange = -0.05;
+				xChange = -0.1;
 				break;
 			}
 	}
@@ -323,20 +331,24 @@ public:
 	void dMove() {
 		switch(direction) {
 			case 'N':
+				pos.x--;
 				yMove = 10;
-				yChange = 0.05;
+				yChange = 0.1;
 				break;
 			case 'S':
+				pos.x++;
 				yMove = 10;
-				yChange = -0.05;
+				yChange = -0.1;
 				break;
 			case 'W':
+				pos.y--;
 				xMove = 10;
-				xChange = -0.05;
+				xChange = -0.1;
 				break;
 			case 'E':
+				pos.y++;
 				xMove = 10;
-				xChange = 0.05;
+				xChange = 0.1;
 				break;
 			}
 	}
