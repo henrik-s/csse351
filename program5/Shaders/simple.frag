@@ -12,7 +12,7 @@ void main()
 	vec4 blueColor = vec4(r, g, b, 1.0);
 	vec4 white = vec4(1);
 	
-	vec4 aColor = blueColor * 0.2; //same color as diffuse, just darker
+	vec4 aColor = blueColor * 0.4; //same color as diffuse, just darker
 	vec4 dColor = d * blueColor;
 	vec4 sColor = s * white;
 	gl_FragColor = aColor + dColor + sColor;
