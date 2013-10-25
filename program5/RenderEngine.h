@@ -12,7 +12,20 @@
 #include "MazeModel.h"
 #include "WallH.h"
 #include "WallV.h"
-
+class Position {
+public:
+	int x;
+	int y;
+	Position(){}
+	Position(int x, int y) {
+		this->x = x;
+		this->y = y;
+	}
+	void printPos() {
+		printf("Camera position: (%d, %d)\n", x, y);
+	}
+private:
+};
 class RenderEngine
 {
 public:
@@ -20,13 +33,15 @@ public:
 	{
 		initialized = false;
 		glm::vec3 e, c, u, axis;
-		e = glm::vec3(-10,5,0.3);
-		c = glm::vec3(0,5,0.3);
-		u = glm::vec3(0,0,1);
+		e = glm::vec3(-10,5,0.3);		// Specifies the position of the eye point.
+		c = glm::vec3(0,5,0.3);			// Specifies the position of the reference point.
+		u = glm::vec3(0,0,1);			// Specifies the direction of the up vector.
 		this->C = glm::lookAt(e, c, u);
 		this->M = glm::mat4(1);
 		direction = 'N';
 		mapToggled = false;
+		pos = Position(-10, 5);
+		pos.printPos();
 	}
 
 	~RenderEngine()
@@ -222,6 +237,7 @@ public:
 				aMove();
 				break;
 			}
+		pos.printPos();
 	}
 
 	/**
@@ -230,18 +246,22 @@ public:
 	void wMove() {
 		switch(direction) {
 			case 'N':
+				pos.x++;
 				xMove = 10;
 				xChange = -0.1;
 				break;
 			case 'S':
+				pos.x--;
 				xMove = 10;
 				xChange = 0.1;
 				break;
-			case 'W':
+			case 'W':			
+				pos.y++;
 				yMove = 10;
 				yChange = -0.1;
 				break;
 			case 'E':
+				pos.y--;
 				yMove = 10;
 				yChange = 0.1;
 				break;
@@ -254,20 +274,24 @@ public:
 	void sMove() {
 		switch(direction) {
 			case 'N':
+				pos.y++;
 				xMove = 10;
-				xChange = 0.05;
+				xChange = 0.1;
 				break;
 			case 'S':
+				pos.y--;
 				xMove = 10;
-				xChange = -0.05;
+				xChange = -0.1;
 				break;
 			case 'W':
+				pos.x++;
 				yMove = 10;
-				yChange = 0.05;
+				yChange = 0.1;
 				break;
 			case 'E':
+				pos.x--;
 				yMove = 10;
-				yChange = -0.05;
+				yChange = -0.1;
 				break;
 			}
 	}
@@ -278,20 +302,24 @@ public:
 	void aMove() {
 		switch(direction) {
 			case 'N':
+				pos.y--;
 				yMove = 10;
-				yChange = -0.05;
+				yChange = -0.1;
 				break;
 			case 'S':
+				pos.y++;
 				yMove = 10;
-				yChange = 0.05;
+				yChange = 0.1;
 				break;
 			case 'W':
+				pos.x--;
 				xMove = 10;
-				xChange = 0.05;
+				xChange = 0.1;
 				break;
 			case 'E':
+				pos.x++;
 				xMove = 10;
-				xChange = -0.05;
+				xChange = -0.1;
 				break;
 			}
 	}
@@ -303,20 +331,24 @@ public:
 	void dMove() {
 		switch(direction) {
 			case 'N':
+				pos.x--;
 				yMove = 10;
-				yChange = 0.05;
+				yChange = 0.1;
 				break;
 			case 'S':
+				pos.x++;
 				yMove = 10;
-				yChange = -0.05;
+				yChange = -0.1;
 				break;
 			case 'W':
+				pos.y--;
 				xMove = 10;
-				xChange = -0.05;
+				xChange = -0.1;
 				break;
 			case 'E':
+				pos.y++;
 				xMove = 10;
-				xChange = 0.05;
+				xChange = 0.1;
 				break;
 			}
 	}
@@ -428,7 +460,7 @@ private:
 	WallV wallVModel;
 	bool initialized;
 
-
+	Position pos;
 	float xChange, yChange, zChange;
 	int xMove, yMove, zMove;
 	bool mapToggled, movement;
@@ -576,5 +608,8 @@ private:
 		checkGLError("rebuild");
 	}
 };
+
+
+
 
 #endif
