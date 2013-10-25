@@ -6,7 +6,7 @@
 #include <vector>
 #include "Maze.h"
 using namespace std; //makes using vectors easy
-#define PI 3.14159265
+#define PI 3.14159265 // scott says 'sscccchhhh' about this one
 
 class WallH
 {
