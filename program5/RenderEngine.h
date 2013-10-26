@@ -22,7 +22,7 @@ public:
 		this->y = y;
 	}
 	void printPos() {
-		printf("Camera position: (%d, %d)\n", x, y);
+		printf("Position: (%d, %d)\n", x, y);
 	}
 private:
 };
@@ -40,8 +40,6 @@ public:
 		this->M = glm::mat4(1);
 		direction = 'N';
 		mapToggled = false;
-		pos = Position(-10, 5);
-		pos.printPos();
 	}
 
 	~RenderEngine()
@@ -71,6 +69,9 @@ public:
 	Save projection, camera and transition matrix and swap
 	*/
 	void toggleMap() {
+		// Prevent interruptiong current movement
+		if (xMove > 0 || yMove > 0 || zMove > 0 || turning > 0)
+			return;
 		if (!mapToggled) {
 			this->Pswap = P;
 			this->Cswap = C;
@@ -104,12 +105,12 @@ public:
 		printf("A = Strafe left\n");
 		printf("S = Backward\n");
 		printf("D = Strafe right\n");
-		printf("Q = Turn quickly left\n");
-		printf("E = Turn quickly right\n");
+		printf("Q = Turn smoothly left\n");
+		printf("E = Turn smoothly right\n");
 		printf("\n");
 		printf("Spacebar = Generate new maze\n");
 		printf("H = Display this help message\n");
-		printf("M = Toggle on/off map mode\n");
+		printf("M = Toggle on/off map\n");
 		printf("\n");
 		printf("--- Map mode ---\n");
 		printf("Move around using W,A,S,D\n");
@@ -217,6 +218,9 @@ public:
 	*/
 	void move(char dir) {
 		movement = true;
+		// Prevent interruptiong current movement
+		if (xMove > 0 || yMove > 0 || zMove > 0 || turning > 0)
+			return;
 		switch(dir) {
 			case 'w':
 				wMove();
@@ -225,10 +229,10 @@ public:
 				sMove();
 				break;
 			case 'e':
-				turn(PI/2);
+				turn(false);
 				break;
 			case 'q':
-				turn(-PI/2);
+				turn(true);
 				break;
 			case 'd':
 				dMove();
@@ -237,129 +241,132 @@ public:
 				aMove();
 				break;
 			}
-		pos.printPos();
+	}
+
+	void tryMove(char direction) {
+		switch (direction) {
+			case 'T':
+				if (!legalMove(pos.x, pos.y, 'T'))
+					return;			
+				if (!mapToggled)
+					pos.y++;
+				yMove = 10;
+				yChange = -0.1;
+				break;
+			case 'B':	
+				if (!legalMove(pos.x, pos.y, 'B'))
+					return;				
+				if (!mapToggled)
+					pos.y--;
+				yMove = 10;
+				yChange = 0.1;
+				break;
+			case 'R':		
+				if (!legalMove(pos.x, pos.y, 'R'))
+					return;			
+				if (!mapToggled)
+					pos.x++;
+				xMove = 10;
+				xChange = -0.1;
+				break;
+			case 'L':	
+				if (!legalMove(pos.x, pos.y, 'L'))
+					return;				
+				if (!mapToggled)
+					pos.x--;
+				xMove = 10;
+				xChange = 0.1;
+				break;
+		}
 	}
 
 	/**
-	Move up, take into consideration the direction the player is facing
+	Try move up, take into consideration the direction the player is facing
 	*/
 	void wMove() {
 		switch(direction) {
 			case 'N':
-				pos.x++;
-				xMove = 10;
-				xChange = -0.1;
+				tryMove('R');
 				break;
 			case 'S':
-				pos.x--;
-				xMove = 10;
-				xChange = 0.1;
+				tryMove('L');
 				break;
-			case 'W':			
-				pos.y++;
-				yMove = 10;
-				yChange = -0.1;
+			case 'W':
+				tryMove('T');
 				break;
-			case 'E':
-				pos.y--;
-				yMove = 10;
-				yChange = 0.1;
+			case 'E':				
+				tryMove('B');
 				break;
 			}
 	}
 
 	/**
-	Move down, take into consideration the direction the player is facing
+	Try move down, take into consideration the direction the player is facing
 	*/
 	void sMove() {
 		switch(direction) {
 			case 'N':
-				pos.y++;
-				xMove = 10;
-				xChange = 0.1;
+				tryMove('L');
 				break;
 			case 'S':
-				pos.y--;
-				xMove = 10;
-				xChange = -0.1;
+				tryMove('R');
 				break;
 			case 'W':
-				pos.x++;
-				yMove = 10;
-				yChange = 0.1;
+				tryMove('B');
 				break;
 			case 'E':
-				pos.x--;
-				yMove = 10;
-				yChange = -0.1;
+				tryMove('T');
 				break;
 			}
 	}
 
 	/**
-	Strafe left, take into consideration the direction the player is facing
+	Try strafe left, take into consideration the direction the player is facing
 	*/
 	void aMove() {
 		switch(direction) {
 			case 'N':
-				pos.y--;
-				yMove = 10;
-				yChange = -0.1;
+				tryMove('T');
 				break;
 			case 'S':
-				pos.y++;
-				yMove = 10;
-				yChange = 0.1;
+				tryMove('B');
 				break;
 			case 'W':
-				pos.x--;
-				xMove = 10;
-				xChange = 0.1;
+				tryMove('L');
 				break;
 			case 'E':
-				pos.x++;
-				xMove = 10;
-				xChange = -0.1;
+				tryMove('R');
 				break;
 			}
 	}
 
-
 	/**
-	Strafe right, take into consideration the direction the player is facing
+	Try strafe right, take into consideration the direction the player is facing
 	*/
 	void dMove() {
 		switch(direction) {
 			case 'N':
-				pos.x--;
-				yMove = 10;
-				yChange = 0.1;
+				tryMove('B');
 				break;
 			case 'S':
-				pos.x++;
-				yMove = 10;
-				yChange = -0.1;
+				tryMove('T');
 				break;
 			case 'W':
-				pos.y--;
-				xMove = 10;
-				xChange = -0.1;
+				tryMove('R');
 				break;
 			case 'E':
-				pos.y++;
-				xMove = 10;
-				xChange = 0.1;
+				tryMove('L');
 				break;
 			}
 	}
 
-
 	/**
 	Turn 90 degrees left or right, and update the direction
 	*/
-	void turn(float angle) {
+	void turn(bool leftTurn) {
+		turningLeft = leftTurn;
 		if (mapToggled) {
-			if (angle > 0) {			
+			if (!turningLeft) {			
 				zMove = 10;
 				zChange = 0.1;
 			}
@@ -369,14 +376,13 @@ public:
 			}
 			return;
 		}
-		if (angle > 0)
+		if (!turningLeft)
 			turnRight();
 		else
 			turnLeft();
-		this->R = glm::mat4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
-		R[0] = glm::vec4(cos(angle), 0, -sin(angle), 0);
-		R[2] = glm::vec4(sin(angle), 0, cos(angle), 0);
-		this->P = this->P*R; // update projection
+
+		// Turn smoothly by rotating the camera 15 times
+		turning = 15;
 	}
 
 	/**
@@ -424,30 +430,93 @@ public:
 			M[3][2] += zChange;
 			zMove--;
 		}
+		if (turning > 0) {
+			updateTurn();
+			turning--;
+		}
+	}
+
+	// Turn smoothly
+	void updateTurn() {
+		float angle;
+		if (turningLeft)
+			angle = -PI/30;
+		else
+			angle = PI/30;
+		this->R = glm::mat4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
+		R[0] = glm::vec4(cos(angle), 0, -sin(angle), 0);
+		R[2] = glm::vec4(sin(angle), 0, cos(angle), 0);
+		this->P = this->P*R;
 	}
 	
 	void reshape(int const & newWidth, int const & newHeight)
 	{
 		glViewport(0, 0, newWidth, newHeight);
 	}
+
+
+	// Check if a move is legal or not by inspecting the cell variable
+	// accessed in Maze.
+	bool legalMove(int x, int y, char direction, bool fromOutside = false) {
+		if (mapToggled)
+			return true;
+		if (y < 0 || y >= maze.getHeight() || x < 0 || x >= maze.getWidth()) {
+			if (fromOutside)		// If try to move to outside position from outside position
+				return true;
+			else {				// 1-recursion to check if there is a wall
+				char wallHack;
+				if (direction == 'T') {
+					wallHack = 'B';
+					y++;
+				}
+				else if (direction == 'B') {
+					wallHack = 'T';
+					y--;
+				}
+				else if (direction == 'R') {
+					wallHack = 'L';
+					x++;
+				}
+				else {
+					wallHack = 'R';
+					x--;
+				}
+				return legalMove(x, y, wallHack, true);
+			}
+		}
+		if (maze.bottomBlocked(x, y) && direction == 'B')
+			return false;
+		if (maze.topBlocked(x, y) && direction == 'T')
+			return false;
+		if (maze.leftBlocked(x, y) && direction == 'L')
+			return false;
+		if (maze.rightBlocked(x, y) && direction == 'R')
+			return false;
+		return true;
+	}
 	
-	void generateMaze(unsigned int const & seed = 1)
+	void generateMaze(unsigned int const & seed = 300)
 	{
-		Maze mazeLayout(w, h, seed);
-
-		unsigned int x,y;
+		maze = Maze(w, h, seed);
+		unsigned int x,y,s,t;
 		bool retry = false;
-		mazeLayout.getLeftOpening(x,y);
-		if (x == 0 && y == 0) // Micah, don't worry about it, Devon helped us with this one
+		maze.getLeftOpening(x,y);
+		maze.getRightOpening(s,t);
+		if (x == 0 && y == 0)
 			retry = true;
-
-		model = MazeModel(mazeLayout);
-		wallHModel = WallH(mazeLayout);
-		wallVModel = WallV(mazeLayout);
+		model = MazeModel(maze);
+		wallHModel = WallH(maze);
+		wallVModel = WallV(maze);
 		if(initialized)
 			rebuildBuffers();
 		else {
+			glm::vec3 e, c, u, axis;
 			this->P = glm::perspective(60.0f, (float)RESOLUTION/(float)RESOLUTION, 0.1f, 200.0f);
+			e = glm::vec3((float)x-1.33,(float)y+0.66,0.3);			// Specifies the position of the eye point.
+			c = glm::vec3(s,(float)y+0.66,0.3);						// Specifies the position of the reference point.
+			u = glm::vec3(0,0,1);									// Specifies the direction of the up vector.
+			this->C = glm::lookAt(e, c, u);
+			pos = Position(x-2, y);
 			setupBuffers();
 		}
 		if (retry)
@@ -456,13 +525,14 @@ public:
 
 private:
 	MazeModel model;
+	Maze maze;
 	WallH wallHModel;
 	WallV wallVModel;
-	bool initialized;
+	bool initialized, turningLeft;
 
-	Position pos;
+	Position pos, startPos, endPos;
 	float xChange, yChange, zChange;
-	int xMove, yMove, zMove;
+	int xMove, yMove, zMove, turning;
 	bool mapToggled, movement;
 	char direction, directionSwap;
 
