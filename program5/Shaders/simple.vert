@@ -2,18 +2,16 @@
 
 uniform mat4 M;
 
+in vec3 norm;
+in vec3 pos;
+
 uniform float transInX;
 uniform float transInY;
-
 uniform float time;
 
-vec4 lightPos = vec4(0,2,2,1);
-attribute vec3 pos;
-in vec3 norm;
-
-varying vec3 fColor;
-varying float d;
-varying float s;
+varying vec4 normal;
+varying vec4 light;
+varying vec4 view;
 
 mat4 translate(vec3 t)
 {
@@ -31,18 +29,16 @@ mat4 rotateY(float a)
 }
 void main()
 {
-	mat4 R = rotateY(time*0.6);
+	vec4 lightPos = vec4(0,2,2,1);
+
+	mat4 R = rotateY(time);
 	mat4 T = translate(vec3(transInX, transInY,0));	
 	vec4 p = vec4(pos, 1);
 	vec4 lpos = R*lightPos;
 	
-	//diffuse coefficient //
-	vec4 l = normalize(lpos - p);
-	vec4 n = vec4(norm, 0);
-	d = clamp(dot(l,n), 0,1);
-	
-
+	normal = vec4(norm, 0);
+	light = normalize(lpos - p);
+	view = normalize(-p);
 	
 	gl_Position = M*T*p;
-	fColor = norm;
 }
